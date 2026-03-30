@@ -307,7 +307,7 @@ pre,.code{font-family:var(--mono);font-size:11px;background:var(--bg);border:1px
     <strong>⚠ Clarification: Why 6 Services, Not 4</strong>
     <p>One document mentioned 4 services (Gateway, Engine, Executor, Publisher). The production-grade architecture has <strong>6 services</strong> because: (1) The WebSocket publisher is separated into its own <strong>WebSocket Hub Service</strong> instead of being embedded in the Gateway — this lets it scale independently based on connection count. (2) A dedicated <strong>User/Auth Service</strong> handles registration, login, JWT issuance/validation, keeping auth logic isolated. (3) A <strong>Risk Service</strong> intercepts every order for pre-trade validation (balance check, limits, duplicates) before it reaches Kafka — this is an industry-standard safety layer. These 3 additions transform a demo into a production-grade system.</p>
   </div>
-
+// 
   <!-- SVC 1 -->
   <div class="svc" style="border-top-color:var(--acc)">
     <div class="svc-name">Service 1 — API Gateway</div>
