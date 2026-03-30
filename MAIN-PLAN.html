@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Order Matching Engine — Complete Project Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#06080D;--bg2:#0B0F18;--bg3:#111825;--bg4:#171F30;
+  --border:#1A2338;--border2:#253050;
+  --text:#D0DBEF;--text2:#7B8EAB;--text3:#3E5272;
+  --acc:#4F8EFF;--acc-dim:#0C1C3E;--acc-t:#A3CBFF;
+  --green:#00D68F;--green-dim:#002E1F;--green-t:#6BFFD0;
+  --amber:#F5A623;--amber-dim:#2D1D00;--amber-t:#FFD580;
+  --red:#FF4D6A;--red-dim:#2B0812;--red-t:#FF9CAE;
+  --purple:#9B6DFF;--purple-dim:#180D35;--purple-t:#C9AAFF;
+  --cyan:#00C9DB;--cyan-dim:#002A30;--cyan-t:#6EF5FF;
+  --mono:'DM Mono',monospace;--sans:'Outfit',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.65;font-size:14px}
+
+/* ── NAV ── */
+.topnav{position:sticky;top:0;z-index:100;background:rgba(6,8,13,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:16px;overflow-x:auto}
+.topnav a{font-family:var(--mono);font-size:11px;color:var(--text3);text-decoration:none;white-space:nowrap;padding:4px 10px;border-radius:4px;transition:.15s}
+.topnav a:hover{color:var(--text);background:var(--bg3)}
+.nav-logo{font-size:12px;font-weight:700;color:#fff;letter-spacing:-.02em;margin-right:8px;flex-shrink:0}
+
+.wrap{max-width:920px;margin:0 auto;padding:0 24px}
+
+/* ── HERO ── */
+.hero{padding:56px 0 40px;border-bottom:1px solid var(--border);margin-bottom:48px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--acc-t);background:var(--acc-dim);border:1px solid var(--acc);padding:4px 14px;border-radius:3px;letter-spacing:.12em;margin-bottom:20px;text-transform:uppercase}
+.hero h1{font-size:clamp(26px,4.5vw,42px);font-weight:900;color:#fff;line-height:1.1;margin-bottom:14px;letter-spacing:-.03em}
+.hero h1 span{background:linear-gradient(135deg,var(--acc),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:15px;color:var(--text2);max-width:700px;line-height:1.8;margin-bottom:28px}
+.stats-row{display:flex;flex-wrap:wrap;gap:10px}
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 16px}
+.stat b{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--acc-t);display:block}
+.stat small{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em}
+.stack-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px}
+.sb{font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 10px;border-radius:3px;letter-spacing:.05em;border:1px solid}
+
+/* ── SECTIONS ── */
+.section{margin-bottom:56px;scroll-margin-top:60px}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.section-num{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:3px}
+.section-title{font-size:20px;font-weight:700;color:#fff}
+.section-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:3px 10px;border-radius:3px;letter-spacing:.08em;border:1px solid;margin-left:auto}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:14px}
+.card h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card p{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:8px}
+.card p:last-child{margin-bottom:0}
+.card strong{color:var(--text);font-weight:600}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-bottom:14px}
+
+/* ── SERVICE CARD ── */
+.svc{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;border-top:3px solid;margin-bottom:12px}
+.svc-name{font-family:var(--mono);font-size:13px;font-weight:700;color:#fff;margin-bottom:4px}
+.svc-role{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px}
+.svc-meta{display:flex;flex-direction:column;gap:5px}
+.svc-row{display:flex;align-items:flex-start;gap:8px;font-size:10px}
+.svc-lbl{font-family:var(--mono);color:var(--text3);min-width:55px;flex-shrink:0}
+.svc-val{color:var(--text2);display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;border:1px solid}
+
+/* ── TABLES ── */
+table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px}
+th{background:var(--bg3);border:1px solid var(--border);padding:8px 12px;text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-weight:700}
+td{border:1px solid var(--border);padding:8px 12px;color:var(--text2);vertical-align:top;line-height:1.55}
+td strong{color:var(--text);font-weight:600}
+tr:hover td{background:var(--bg3)}
+td code,th code{font-family:var(--mono);font-size:10px;background:var(--bg);padding:1px 5px;border-radius:3px;color:var(--acc-t);border:1px solid var(--border)}
+
+/* ── CODE ── */
+pre,.code{font-family:var(--mono);font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:16px;overflow-x:auto;line-height:1.75;color:#A8C1E8;margin-bottom:14px;white-space:pre}
+.kw{color:#C792EA}.fn{color:#82AAFF}.str{color:#C3E88D}.cm{color:#3D5C7A;font-style:italic}.num{color:#F78C6C}.ty{color:#FFCB6B}
+
+/* ── CALLOUT ── */
+.callout{border-radius:7px;padding:14px 16px;border:1px solid;border-left:3px solid;margin-bottom:16px;font-size:12px;line-height:1.7}
+.callout strong{font-weight:700;display:block;margin-bottom:4px}
+.callout p{margin:0}
+.c-blue{background:var(--acc-dim);border-color:var(--acc);color:var(--acc-t)}
+.c-green{background:var(--green-dim);border-color:var(--green);color:var(--green-t)}
+.c-amber{background:var(--amber-dim);border-color:var(--amber);color:var(--amber-t)}
+.c-red{background:var(--red-dim);border-color:var(--red);color:var(--red-t)}
+.c-purple{background:var(--purple-dim);border-color:var(--purple);color:var(--purple-t)}
+.c-cyan{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan-t)}
+
+/* ── FLOW STEPS ── */
+.flow{counter-reset:step;display:flex;flex-direction:column;gap:0}
+.fstep{display:flex;gap:16px;position:relative;padding-bottom:18px}
+.fstep:last-child{padding-bottom:0}
+.fstep-n{flex-shrink:0;width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text2);z-index:1;margin-top:2px}
+.fstep::before{content:'';position:absolute;left:13px;top:30px;bottom:0;width:1px;background:var(--border)}
+.fstep:last-child::before{display:none}
+.fstep-body{flex:1;padding-top:4px}
+.fstep-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:4px}
+.fstep-desc{font-size:12px;color:var(--text2);line-height:1.7}
+.fstep-code{font-family:var(--mono);font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px 10px;margin-top:6px;color:#7B9FD0}
+
+/* ── TREE ── */
+.tree{font-family:var(--mono);font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:16px;line-height:1.9;color:var(--text2);overflow-x:auto;white-space:pre}
+.tree .dir{color:var(--acc-t);font-weight:600}
+.tree .cmt{color:var(--text3);font-style:italic}
+.tree .hl{color:var(--amber-t)}
+
+/* ── SCHEMA ── */
+.schema{background:var(--bg);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:12px}
+.schema-h{background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px}
+.schema-tn{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--amber-t)}
+.schema-db{font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--bg);border:1px solid var(--border);padding:2px 6px;border-radius:3px}
+.schema-col{display:flex;align-items:baseline;gap:0;padding:5px 14px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px}
+.schema-col:last-child{border-bottom:none}
+.sc-name{color:var(--cyan-t);min-width:170px;flex-shrink:0}
+.sc-type{color:var(--amber-t);min-width:120px;flex-shrink:0}
+.sc-flags{color:var(--text3);font-size:9px;margin-right:auto}
+.sc-note{color:var(--text3);font-size:9px;font-style:italic}
+
+/* ── DAY CARDS ── */
+.day{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg2);margin-bottom:8px;transition:border-color .15s}
+.day:hover{border-color:var(--border2)}
+.day-h{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none}
+.day-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.day-num{font-family:var(--mono);font-size:10px;color:var(--text3);font-weight:500;flex-shrink:0;width:55px}
+.day-name{font-size:13px;font-weight:600;color:var(--text);flex:1}
+.day-tag{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;flex-shrink:0;letter-spacing:.03em}
+.chev{color:var(--text3);font-size:10px;transition:transform .2s;flex-shrink:0}
+.chev.open{transform:rotate(180deg)}
+.day-b{display:none;padding:0 16px 14px}
+.day-b.open{display:block}
+.task-list{list-style:none}
+.task-list li{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.55}
+.task-list li:last-child{border:none}
+.task-icon{width:16px;height:16px;border-radius:3px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#fff;font-family:var(--mono)}
+.sec-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-top:14px;margin-bottom:7px;font-weight:700}
+.explain{margin-top:10px;padding:14px;background:var(--bg3);border-radius:7px;border:1px solid var(--border)}
+.explain p{font-size:12px;color:var(--text2);line-height:1.75;margin-bottom:8px}
+.explain p:last-child{margin-bottom:0}
+.explain strong{color:var(--text);font-weight:600}
+.outcome{margin-top:12px;padding:10px 13px;border-radius:7px;font-size:12px;font-weight:600;display:flex;gap:8px;align-items:flex-start}
+.outcome::before{content:'✓';flex-shrink:0;margin-top:1px}
+
+/* ── WEEK HEADER ── */
+.week-h{margin-bottom:18px;padding:18px;background:var(--bg2);border:1px solid var(--border);border-radius:10px}
+.week-top{display:flex;align-items:flex-start;gap:14px}
+.week-num{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:4px;font-weight:700;flex-shrink:0;margin-top:3px}
+.week-title{font-size:17px;font-weight:700;color:#fff;margin-bottom:4px}
+.week-sub{font-size:12px;color:var(--text2);line-height:1.65}
+.week-why{margin-top:14px;padding:12px 14px;border-radius:7px;font-size:12px;line-height:1.7;color:var(--text2);border-left:3px solid}
+
+/* ── IMPROVEMENT ITEMS ── */
+.imp{display:flex;gap:12px;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:8px}
+.imp-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.imp-body{flex:1}
+.imp-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px}
+.imp-desc{font-size:12px;color:var(--text2);line-height:1.65}
+.imp-badge{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;border:1px solid;flex-shrink:0;align-self:flex-start;margin-top:2px}
+
+.divider{height:1px;background:var(--border);margin:32px 0}
+
+@media(max-width:700px){
+  .card-grid{grid-template-columns:1fr}
+  .topnav{padding:8px 12px}
+  .wrap{padding:0 12px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAV ── -->
+<nav class="topnav">
+  <span class="nav-logo">⚡ OrderEngine</span>
+  <a href="#overview">Overview</a>
+  <a href="#services">Services</a>
+  <a href="#comms">Communication</a>
+  <a href="#dataflow">Data Flow</a>
+  <a href="#structure">Folder Structure</a>
+  <a href="#database">Database</a>
+  <a href="#docker">Docker & K8s</a>
+  <a href="#week1">Week 1</a>
+  <a href="#week2">Week 2</a>
+  <a href="#week3">Week 3</a>
+  <a href="#week4">Week 4</a>
+  <a href="#week5">Week 5</a>
+  <a href="#improvements">Improvements</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ════════════════════════════════════ -->
+<!-- HERO                                 -->
+<!-- ════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-badge">⚙ Complete Project Blueprint — Unified A-to-Z Document</div>
+  <h1>Order <span>Matching Engine</span><br/>in Go — Full Blueprint</h1>
+  <p class="hero-sub">A production-grade, distributed trading engine built in Go across 5 weeks. This document merges the complete system design architecture with the day-by-day execution plan — every service, every data flow, every line of code structure, and every task you need to complete. From zero to a live Kubernetes-deployed trading engine.</p>
+
+  <div class="stats-row">
+    <div class="stat"><b>100k+</b><small>Orders/sec target</small></div>
+    <div class="stat"><b>&lt;1ms</b><small>Match latency</small></div>
+    <div class="stat"><b>6</b><small>Microservices</small></div>
+    <div class="stat"><b>3</b><small>Kafka topics core</small></div>
+    <div class="stat"><b>2</b><small>Databases (PG + Redis)</small></div>
+    <div class="stat"><b>5</b><small>Weeks to complete</small></div>
+    <div class="stat"><b>34</b><small>Working days</small></div>
+    <div class="stat"><b>80%+</b><small>Test coverage</small></div>
+  </div>
+
+  <div class="stack-row">
+    <span class="sb" style="color:#00ADD8;border-color:#00ADD833;background:#00ADD812">Go 1.22</span>
+    <span class="sb" style="color:#FF6B35;border-color:#FF6B3533;background:#FF6B3512">gRPC</span>
+    <span class="sb" style="color:#FCD34D;border-color:#FCD34D33;background:#FCD34D08">Apache Kafka</span>
+    <span class="sb" style="color:#336791;border-color:#33679133;background:#33679112">PostgreSQL</span>
+    <span class="sb" style="color:#FF4438;border-color:#FF443833;background:#FF443812">Redis</span>
+    <span class="sb" style="color:var(--purple-t);border-color:var(--purple);background:var(--purple-dim)">B-tree</span>
+    <span class="sb" style="color:#2496ED;border-color:#2496ED33;background:#2496ED12">Docker</span>
+    <span class="sb" style="color:#326CE5;border-color:#326CE533;background:#326CE512">Kubernetes</span>
+    <span class="sb" style="color:#E6522C;border-color:#E6522C33;background:#E6522C12">Prometheus</span>
+    <span class="sb" style="color:var(--cyan-t);border-color:var(--cyan);background:var(--cyan-dim)">WebSocket</span>
+    <span class="sb" style="color:#F46800;border-color:#F4680033;background:#F4680012">Helm</span>
+    <span class="sb" style="color:var(--green-t);border-color:var(--green);background:var(--green-dim)">Istio</span>
+    <span class="sb" style="color:var(--amber-t);border-color:var(--amber);background:var(--amber-dim)">ArgoCD</span>
+    <span class="sb" style="color:var(--red-t);border-color:var(--red);background:var(--red-dim)">KEDA</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- SECTION 1: SYSTEM OVERVIEW          -->
+<!-- ════════════════════════════════════ -->
+<section class="section" id="overview">
+  <div class="section-head">
+    <span class="section-num">01</span>
+    <h2 class="section-title">System Overview</h2>
+    <span class="section-badge" style="background:var(--acc-dim);border-color:var(--acc);color:var(--acc-t)">FOUNDATION</span>
+  </div>
+
+  <div class="card">
+    <h3>What This System Does</h3>
+    <p>This is a <strong>real-time financial order matching engine</strong> — the core component of any stock exchange, crypto exchange, or dark pool. It accepts buy and sell orders from traders, matches them using a <strong>price-time priority (FIFO)</strong> algorithm, executes resulting trades, and broadcasts live market data to connected clients — all with sub-millisecond latency.</p>
+    <p>Think of it as building the engine that powers NSE/BSE or Binance's order book. A buyer submits "Buy 100 shares of INFY at ₹1,500." The engine finds a seller willing to sell at ≤₹1,500, executes the trade atomically, settles the positions, and notifies both parties — in under a millisecond, continuously, at 100,000+ operations per second.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card" style="margin-bottom:0;border-top:3px solid var(--acc)">
+      <h3>🎯 Order Ingestion</h3>
+      <p>Accept, validate, and authenticate incoming orders (LIMIT, MARKET) over REST and gRPC. Apply pre-trade risk checks before any order touches the book.</p>
+    </div>
+    <div class="card" style="margin-bottom:0;border-top:3px solid var(--cyan)">
+      <h3>⚡ Matching Algorithm</h3>
+      <p>Execute price-time priority matching at the core. Single-threaded per symbol goroutine for lock-free correctness. Handle partial fills, full fills, self-match prevention.</p>
+    </div>
+    <div class="card" style="margin-bottom:0;border-top:3px solid var(--green)">
+      <h3>💾 Trade Settlement</h3>
+      <p>Persist executed trades to PostgreSQL atomically. Update buyer/seller balances and positions in a single DB transaction. Ensure exactly-once semantics.</p>
+    </div>
+    <div class="card" style="margin-bottom:0;border-top:3px solid var(--amber)">
+      <h3>📡 Real-Time Broadcast</h3>
+      <p>Push order book depth updates and trade ticks to all subscribed WebSocket clients. Fan-out via Kafka → WebSocket Hub for decoupled, scalable delivery.</p>
+    </div>
+    <div class="card" style="margin-bottom:0;border-top:3px solid var(--purple)">
+      <h3>🔒 Auth & Risk</h3>
+      <p>JWT authentication at the gateway layer. mTLS between services via Istio. Pre-trade checks: balance sufficiency, position limits, order size validation.</p>
+    </div>
+    <div class="card" style="margin-bottom:0;border-top:3px solid var(--red)">
+      <h3>🔭 Observability</h3>
+      <p>Prometheus metrics on every service. Grafana dashboards for throughput/latency. Jaeger distributed tracing end-to-end. Structured JSON logs for audit trail.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>System Boundaries</h3>
+    <table>
+      <thead><tr><th>Boundary</th><th>Inside Scope</th><th>Outside Scope (future)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Order types</strong></td><td>LIMIT, MARKET orders; partial fills, full fills</td><td>STOP, IOC, FOK, Iceberg orders</td></tr>
+        <tr><td><strong>Assets</strong></td><td>Single currency pair / multi-symbol support</td><td>Cross-currency settlement, derivatives</td></tr>
+        <tr><td><strong>Clients</strong></td><td>REST API clients, WebSocket browser clients</td><td>FIX protocol, co-location feeds</td></tr>
+        <tr><td><strong>Settlement</strong></td><td>DB-level position/balance update (logical)</td><td>Actual clearing house integration</td></tr>
+        <tr><td><strong>Security</strong></td><td>JWT auth, mTLS, RBAC, rate limiting</td><td>2FA, KYC/AML, regulatory reporting</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ -->
+<!-- SECTION 2: ALL 6 SERVICES           -->
+<!-- ════════════════════════════════════ -->
+<section class="section" id="services">
+  <div class="section-head">
+    <span class="section-num">02</span>
+    <h2 class="section-title">All 6 Microservices — Complete Definition</h2>
+    <span class="section-badge" style="background:var(--acc-dim);border-color:var(--acc);color:var(--acc-t)">ARCHITECTURE</span>
+  </div>
+
+  <div class="callout c-blue">
+    <strong>Design Philosophy</strong>
+    <p>The system follows an <strong>event-driven microservices architecture</strong> with a critical constraint: the matching engine per symbol is intentionally single-threaded (one goroutine per symbol's OrderBook) to eliminate locking overhead and ensure total ordering of operations. Kafka provides the durable, replayable event bus between all services. gRPC handles synchronous service-to-service communication where a response is needed immediately.</p>
+  </div>
+
+  <div class="callout c-amber">
+    <strong>⚠ Clarification: Why 6 Services, Not 4</strong>
+    <p>One document mentioned 4 services (Gateway, Engine, Executor, Publisher). The production-grade architecture has <strong>6 services</strong> because: (1) The WebSocket publisher is separated into its own <strong>WebSocket Hub Service</strong> instead of being embedded in the Gateway — this lets it scale independently based on connection count. (2) A dedicated <strong>User/Auth Service</strong> handles registration, login, JWT issuance/validation, keeping auth logic isolated. (3) A <strong>Risk Service</strong> intercepts every order for pre-trade validation (balance check, limits, duplicates) before it reaches Kafka — this is an industry-standard safety layer. These 3 additions transform a demo into a production-grade system.</p>
+  </div>
+
+  <!-- SVC 1 -->
+  <div class="svc" style="border-top-color:var(--acc)">
+    <div class="svc-name">Service 1 — API Gateway</div>
+    <div class="svc-role">The single entry point for all external client traffic. Handles HTTP/1.1 REST, WebSocket upgrades, JWT validation, rate limiting, and request routing. Translates REST calls into gRPC calls to internal services. Does NOT touch the order book — it is purely a routing/auth layer. Stateless — scales horizontally without coordination. This is the ONLY service exposed to the public internet.</div>
+    <div class="svc-meta">
+      <div class="svc-row"><span class="svc-lbl">Port</span><span class="svc-val">:8080 (REST/WS)</span></div>
+      <div class="svc-row"><span class="svc-lbl">Stack</span><span class="svc-val">
+        <span class="tag" style="color:var(--acc-t);border-color:var(--acc);background:var(--acc-dim)">Go 1.22</span>
+        <span class="tag" style="color:var(--cyan-t);border-color:var(--cyan);background:var(--cyan-dim)">Gin</span>
+        <span class="tag" style="color:var(--green-t);border-color:var(--green);background:var(--green-dim)">JWT-Go</span>
+      </span></div>
+      <div class="svc-row"><span class="svc-lbl">Comms</span><span class="svc-val">
+        <span class="tag" style="color:var(--amber-t);border-color:var(--amber);background:var(--amber-dim)">REST inbound</span>
+        <span class="tag" style="color:var(--purple-t);border-color:var(--purple);background:var(--purple-dim)">gRPC → Auth, Risk</span>
+        <span class="tag" style="color:var(--red-t);border-color:var(--red);background:var(--red-dim)">Kafka producer</span>
+      </span></div>
+      <div class="svc-row"><span class="svc-lbl">Scales</span><span class="svc-val">HPA on CPU — stateless, trivially horizontal</span></div>
+      <div class="svc-row"><span class="svc-lbl">Key Role</span><span class="svc-val">Protocol translation only. Zero business logic.</span></div>
+    </div>
+  </div>
+
+  <!-- SVC 2 -->
+  <div class="svc" style="border-top-color:var(--red)">
+    <div class="svc-name">Service 2 — Matching Engine</div>
+    <div class="svc-role">The performance-critical core. Maintains one OrderBook struct per trading symbol <strong>in memory</strong>. Runs one dedicated goroutine per symbol — this is the key architectural decision that eliminates lock contention. Consumes orders from Kafka (<code>orders.submitted</code>), executes the price-time priority matching algorithm using a <strong>B-tree</strong> (<code>google/btree</code>) for price levels with FIFO queues at each level, and produces Trade events to Kafka (<code>trades.executed</code>). Also publishes order book depth snapshots to <code>orderbook.updates</code>.</div>
+    <div class="svc-meta">
+      <div class="svc-row"><span class="svc-lbl">Port</span><span class="svc-val">:9090 (gRPC server for streaming)</span></div>
+      <div class="svc-row"><span class="svc-lbl">Stack</span><span class="svc-val">
+        <span class="tag" style="color:var(--acc-t);border-color:var(--acc);background:var(--acc-dim)">Go 1.22</span>
+        <span class="tag" style="color:var(--red-t);border-color:var(--red);background:var(--red-dim)">google/btree</span>
+        <span class="tag" style="color:var(--cyan-t);border-color:var(--cyan);background:var(--cyan-dim)">gRPC server</span>
+        <span class="tag" style="color:var(--green-t);border-color:var(--green);background:var(--green-dim)">kafka-go</span>
+      </span></div>
+      <div class="svc-row"><span class="svc-lbl">Data</span><span class="svc-val">In-memory B-tree OrderBook. Never persisted to DB during operation. Rebuilt from Kafka on restart.</span></div>
+      <div class="svc-row"><span class="svc-lbl">Scales</span><span class="svc-val">Horizontal by symbol shard — each instance owns a subset of symbols via Kafka partition</span></div>
+    </div>
+  </div>
+
+  <!-- SVC 3 -->
+  <div class="svc" style="border-top-color:var(--green)">
+    <div class="svc-name">Service 3 — Trade Executor</div>
+    <div class="svc-role">Consumes the <code>trades.executed</code> Kafka topic and is responsible for persistent settlement: writes trade records to PostgreSQL, updates buyer/seller position and balance tables in a single <strong>atomic transaction</strong>, and emits order status updates. Uses idempotency keys (tradeID) to handle at-least-once Kafka delivery safely. Also updates Redis balance cache after successful DB writes.</div>
+    <div class="svc-meta">
+      <div class="svc-row"><span class="svc-lbl">Stack</span><span class="svc-val">
+        <span class="tag" style="color:var(--acc-t);border-color:var(--acc);background:var(--acc-dim)">Go 1.22</span>
+        <span class="tag" style="color:var(--amber-t);border-color:var(--amber);background:var(--amber-dim)">pgx v5</span>
+        <span class="tag" style="color:var(--green-t);border-color:var(--green);background:var(--green-dim)">go-redis v9</span>
+      </span></div>
+      <div class="svc-row"><span class="svc-lbl">Comms</span><span class="svc-val">Kafka consumer → PostgreSQL TX → Redis cache write</span></div>
+      <div class="svc-row"><span class="svc-lbl">Scales</span><span class="svc-val">KEDA on Kafka consumer lag — adds replicas when trades.executed backlog grows</span></div>
+    </div>
+  </div>
+
+  <!-- SVC 4 -->
+  <div class="svc" style="border-top-color:var(--cyan)">
+    <div class="svc-name">Service 4 — WebSocket Hub</div>
+    <div class="svc-role">Dedicated service for real-time market data fan-out. Maintains a registry of active WebSocket connections keyed by subscribed symbol. Consumes the <code>orderbook.updates</code> Kafka topic and pushes depth snapshots to all clients subscribed to that symbol. Decoupled from the engine entirely — can be scaled independently. Uses goroutine-per-connection model with context cancellation for clean disconnections. Drops slow clients via backpressure (buffered send channel, capacity 256).</div>
+    <div class="svc-meta">
+      <div class="svc-row"><span class="svc-lbl">Port</span><span class="svc-val">:8081 (WebSocket)</span></div>
+      <div class="svc-row"><span class="svc-lbl">Stack</span><span class="svc-val">
+        <span class="tag" style="color:var(--acc-t);border-color:var(--acc);background:var(--acc-dim)">Go 1.22</span>
+        <span class="tag" style="color:var(--cyan-t);border-color:var(--cyan);background:var(--cyan-dim)">gorilla/websocket</span>
+        <span class="tag" style="color:var(--green-t);border-color:var(--green);background:var(--green-dim)">kafka-go</span>
+      </span></div>
+      <div class="svc-row"><span class="svc-lbl">Scales</span><span class="svc-val">HPA on connection count or CPU — each pod handles ~10k connections (~50KB/conn)</span></div>
+    </div>
+  </div>
+
+  <!-- SVC 5 -->
+  <div class="svc" style="border-top-color:var(--purple)">
+    <div class="svc-name">Service 5 — User / Auth Service</div>
+    <div class="svc-role">Manages user registration, login, and JWT token issuance/refresh. Stores user credentials in PostgreSQL (bcrypt hashed, cost=12). Issues short-lived access tokens (15min) and long-lived refresh tokens (7d) stored in Redis. Provides a gRPC endpoint for the Gateway to validate tokens without hitting the database on every request. Handles account balance seeding for test environments.</div>
+    <div class="svc-meta">
+      <div class="svc-row"><span class="svc-lbl">Port</span><span class="svc-val">:8082 (REST) / :9091 (gRPC)</span></div>
+      <div class="svc-row"><span class="svc-lbl">Stack</span><span class="svc-val">
+        <span class="tag" style="color:var(--acc-t);border-color:var(--acc);background:var(--acc-dim)">Go 1.22</span>
+        <span class="tag" style="color:var(--amber-t);border-color:var(--amber);background:var(--amber-dim)">pgx v5</span>
+        <span class="tag" style="color:var(--green-t);border-color:var(--green);background:var(--green-dim)">jwt-go v5</span>
+      </span></div>
+      <div class="svc-row"><span class="svc-lbl">Comms</span><span class="svc-val">gRPC server (for Gateway), PostgreSQL, Redis (sessions/refresh tokens)</span></div>
+    </div>
+  </div>
+
+  <!-- SVC 6 -->
+  <div class="svc" style="border-top-color:var(--amber)">
+    <div class="svc-name">Service 6 — Risk Service (Pre-Trade)</div>
+    <div class="svc-role">Intercepts every order <strong>before</strong> it reaches Kafka/engine. Validates: sufficient available balance for the order value, position limits not exceeded, order size within symbol-specific limits, and duplicate order ID check. Reads balances from Redis cache (fast path — sub-millisecond). If Redis misses, falls back to PostgreSQL. Rejects invalid orders with specific error codes. This is an industry-standard component that prevents bad data from polluting the order book.</div>
+    <div class="svc-meta">
+      <div class="svc-row"><span class="svc-lbl">Stack</span><span class="svc-val">
+        <span class="tag" style="color:var(--acc-t);border-color:var(--acc);background:var(--acc-dim)">Go 1.22</span>
+        <span class="tag" style="color:var(--cyan-t);border-color:var(--cyan);background:var(--cyan-dim)">Redis read</span>
+      </span></div>
+      <div class="svc-row"><span class="svc-lbl">Comms</span><span class="svc-val">gRPC (sync, in Gateway request path, ~1ms latency)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ -->
+<!-- SECTION 3: COMMUNICATION            -->
+<!-- ════════════════════════════════════ -->
+<section class="section" id="comms">
+  <div class="section-head">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Service Communication & Protocols</h2>
+    <span class="section-badge" style="background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan-t)">PROTOCOLS</span>
+  </div>
+
+  <table>
+    <thead><tr><th>From → To</th><th>Protocol</th><th>Reason</th><th>Sync/Async</th></tr></thead>
+    <tbody>
+      <tr><td>Client → Gateway</td><td><code>REST / HTTP</code></td><td>Standard web protocol, easy for clients</td><td>Sync</td></tr>
+      <tr><td>Client → WS Hub</td><td><code>WebSocket</code></td><td>Persistent bidirectional for live data</td><td>Async streaming</td></tr>
+      <tr><td>Gateway → Auth Svc</td><td><code>gRPC</code></td><td>Token validation needs immediate response</td><td>Sync</td></tr>
+      <tr><td>Gateway → Risk Svc</td><td><code>gRPC</code></td><td>Fast, typed, synchronous pre-trade check</td><td>Sync</td></tr>
+      <tr><td>Gateway → Kafka</td><td><code>Kafka produce</code></td><td>Durable queue, decouples gateway from engine</td><td>Async</td></tr>
+      <tr><td>Kafka → Engine</td><td><code>Kafka consume</code></td><td>Ordered, replayable, backpressure-safe</td><td>Async</td></tr>
+      <tr><td>Engine → Kafka</td><td><code>Kafka produce</code></td><td>Decouples trade persistence from matching</td><td>Async</td></tr>
+      <tr><td>Kafka → Executor</td><td><code>Kafka consume</code></td><td>Trade settlement must be reliable & ordered</td><td>Async</td></tr>
+      <tr><td>Kafka → WS Hub</td><td><code>Kafka consume</code></td><td>Decouples market data fan-out from engine</td><td>Async</td></tr>
+      <tr><td>Executor → PostgreSQL</td><td><code>TCP / pgx</code></td><td>ACID transactions for trade settlement</td><td>Sync</td></tr>
+      <tr><td>Risk Svc → Redis</td><td><code>TCP / RESP</code></td><td>Sub-ms balance lookup, hot path</td><td>Sync</td></tr>
+      <tr><td>Auth Svc → Redis</td><td><code>TCP / RESP</code></td><td>Session/token cache</td><td>Sync</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card">
+    <h3>Kafka Topics</h3>
+    <table>
+      <thead><tr><th>Topic</th><th>Partitions</th><th>Key</th><th>Retention</th><th>Replication</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>orders.submitted</code></td><td>6</td><td>symbol</td><td>7 days</td><td>3</td><td>All validated orders from Gateway → Engine</td></tr>
+        <tr><td><code>trades.executed</code></td><td>6</td><td>tradeID</td><td>30 days</td><td>3</td><td>Matched trades from Engine → Executor</td></tr>
+        <tr><td><code>orderbook.updates</code></td><td>6</td><td>symbol</td><td>1 hour</td><td>1</td><td>Depth snapshots from Engine → WS Hub</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ -->
+<!-- SECTION 4: DATA FLOW                -->
+<!-- ════════════════════════════════════ -->
+<section class="section" id="dataflow">
+  <div class="section-head">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Complete Data Flow — End to End</h2>
+    <span class="section-badge" style="background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan-t)">E2E FLOW</span>
+  </div>
+
+  <div class="callout c-blue">
+    <strong>Example Request: "Buy 100 INFY at ₹1500"</strong>
+    <p>Follow this single order from the trader's browser all the way through matching, settlement, and back to the trader's screen as a live depth update.</p>
+  </div>
+
+  <div class="card">
+    <h3>Flow A — Order Submission & Validation</h3>
+    <div class="flow">
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--acc);color:var(--acc-t)">1</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Client sends REST request</div>
+          <div class="fstep-desc">Trader submits <code>POST /api/v1/orders</code> with JWT in Authorization header.</div>
+          <div class="fstep-code">POST /api/v1/orders → { "symbol":"INFY","side":"BUY","type":"LIMIT","price":1500.0,"qty":100 }</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--acc);color:var(--acc-t)">2</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Gateway — JWT validation + rate limiting</div>
+          <div class="fstep-desc">Gin middleware validates JWT signature via Auth Service (gRPC, cached in Redis). Extracts userID. Rate limiter checks Redis sliding window counter. If over limit → 429. If invalid JWT → 401.</div>
+          <div class="fstep-code">Gateway → AuthSvc.ValidateToken(jwt) [gRPC, ~0.5ms] → { userID: "u123", valid: true }</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--amber);color:var(--amber-t)">3</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Gateway → Risk Service pre-trade check</div>
+          <div class="fstep-desc">Does user u123 have ≥ ₹150,000 available (100 × 1500)? Order size within limits? Duplicate orderID? Risk reads from Redis balance cache for sub-millisecond checks.</div>
+          <div class="fstep-code">Gateway → RiskSvc.CheckOrder(order) [gRPC, ~1ms] → { approved: true }</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--amber);color:var(--amber-t)">4</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Gateway publishes to Kafka: orders.submitted</div>
+          <div class="fstep-desc">Serialized as Protobuf, partition key = symbol ("INFY"). Ensures all INFY orders go to the same partition. Gateway responds <strong>202 Accepted</strong> with orderID immediately.</div>
+          <div class="fstep-code">Kafka.Produce(topic="orders.submitted", key="INFY", value=OrderProto) → Client gets 202 {orderID:"ord-xyz"}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Flow B — Matching Logic</h3>
+    <div class="flow">
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--red);color:var(--red-t)">5</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Engine consumes from orders.submitted</div>
+          <div class="fstep-desc">Consumer group <code>engine-group</code>. Message key "INFY" → hashed to partition 0 → this engine instance owns it. Routes to INFY goroutine via buffered channel.</div>
+          <div class="fstep-code">engineCh["INFY"] &lt;- order  // buffered chan *Order, capacity 1000</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--red);color:var(--red-t)">6</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Symbol goroutine runs Match()</div>
+          <div class="fstep-desc">For a BUY at ₹1500: B-tree <code>Ascend()</code> walks asks from lowest upward. If lowest ask ≤ 1500, match. Fill quantity FIFO from that price level. Produce []Trade. Remaining unfilled qty rests on bids side.</div>
+          <div class="fstep-code">trades := book.Match(order)  // O(log n + k) where k = number of fills</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--red);color:var(--red-t)">7</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Engine publishes trades + book update</div>
+          <div class="fstep-desc">Produces to <code>trades.executed</code> (key=tradeID) and <code>orderbook.updates</code> (key=symbol). Both in same goroutine loop — no synchronization needed.</div>
+          <div class="fstep-code">Kafka.Produce("trades.executed", key=trade.ID, value=TradeProto)
+Kafka.Produce("orderbook.updates", key="INFY", value=DepthSnapshot)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Flow C — Trade Settlement</h3>
+    <div class="flow">
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--green);color:var(--green-t)">8</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Executor consumes trades.executed</div>
+          <div class="fstep-desc">Checks Redis for idempotency key <code>trade:{tradeID}</code>. If already processed → skip. Otherwise proceeds to DB write.</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--green);color:var(--green-t)">9</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Atomic PostgreSQL transaction</div>
+          <div class="fstep-desc">Single transaction: INSERT trade, UPDATE balances (debit buyer, credit seller), UPDATE positions (credit buyer shares, debit seller shares), UPDATE order status. If any step fails → ROLLBACK → Kafka offset NOT committed → retry.</div>
+          <div class="fstep-code">BEGIN;
+  INSERT INTO trades VALUES (trade.ID, ...);
+  UPDATE balances SET available = available - 150000 WHERE user_id = buyerID;
+  UPDATE positions SET quantity = quantity + 100 WHERE user_id = buyerID AND symbol = 'INFY';
+  UPDATE orders SET filled_qty = filled_qty + 100, status = 'FILLED' WHERE id = buyOrderID;
+COMMIT;
+Redis.Set("trade:"+trade.ID, "1", 24h)  // idempotency key</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--green);color:var(--green-t)">10</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Commit Kafka offset</div>
+          <div class="fstep-desc">Only AFTER successful DB commit AND Redis key set. Guarantees: crash before offset commit → trade reprocessed on restart → idempotency key prevents double-settlement.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Flow D — Real-Time Update to Client</h3>
+    <div class="flow">
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--cyan);color:var(--cyan-t)">11</div>
+        <div class="fstep-body">
+          <div class="fstep-title">WS Hub consumes orderbook.updates</div>
+          <div class="fstep-desc">Receives depth snapshot for INFY. Looks up in-memory connection registry for all WebSocket connections subscribed to "INFY".</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--cyan);color:var(--cyan-t)">12</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Fan-out to subscribed clients</div>
+          <div class="fstep-desc">Non-blocking send to each client's buffered <code>sendCh</code>. Slow clients dropped after buffer overflow.</div>
+        </div>
+      </div>
+      <div class="fstep">
+        <div class="fstep-n" style="border-color:var(--cyan);color:var(--cyan-t)">13</div>
+        <div class="fstep-body">
+          <div class="fstep-title">Client receives live order book update</div>
+          <div class="fstep-desc">Browser gets JSON via WebSocket. UI updates the order book display in real time.</div>
+          <div class="fstep-code">{"type":"depth","symbol":"INFY","bids":[[1500,200],[1499,500]],"asks":[[1501,100],[1502,300]],"ts":1712345678901}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Latency Breakdown (End-to-End)</h3>
+    <table>
+      <thead><tr><th>Stage</th><th>Latency</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Client → Gateway (network)</td><td>1–5ms</td><td>Local: &lt;1ms</td></tr>
+        <tr><td>JWT validation (Redis cache hit)</td><td>0.3–0.5ms</td><td>Cache miss → gRPC to Auth: +2ms</td></tr>
+        <tr><td>Risk check (Redis)</td><td>0.2–0.5ms</td><td>Balance read from Redis hash</td></tr>
+        <tr><td>Kafka produce</td><td>1–3ms</td><td>acks=1 for gateway</td></tr>
+        <tr><td><strong>Match() execution</strong></td><td><strong>&lt;100μs</strong></td><td>In-memory B-tree, single goroutine. Typical: 5–20μs</td></tr>
+        <tr><td>Kafka produce (trades + depth)</td><td>1–3ms</td><td>Async, doesn't block matching</td></tr>
+        <tr><td>Kafka → WS Hub consume</td><td>1–5ms</td><td>Consumer poll interval</td></tr>
+        <tr><td>WebSocket push</td><td>0.1ms</td><td>In-memory channel write</td></tr>
+        <tr><td><strong>Total (order → UI update)</strong></td><td><strong>10–30ms local</strong></td><td>50–150ms over internet</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ -->
+<!-- SECTION 5: FOLDER STRUCTURE         -->
+<!-- ════════════════════════════════════ -->
+<section class="section" id="structure">
+  <div class="section-head">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Production Folder Structure</h2>
+    <span class="section-badge" style="background:var(--amber-dim);border-color:var(--amber);color:var(--amber-t)">GOLANG</span>
+  </div>
+
+  <div class="callout c-blue">
+    <strong>Structure Philosophy</strong>
+    <p>Follows Go project layout conventions: <code>cmd/</code> for entry points (thin — only wire-up), <code>internal/</code> for all business logic that should NOT be imported externally, <code>api/</code> for protobuf definitions and generated code, <code>pkg/</code> for reusable utilities. Each service's <code>main.go</code> wires together components from <code>internal/</code> — zero business logic in main.</p>
+  </div>
+
+  <div class="tree"><span class="dir">order-engine/</span>
+<span class="hl">├── cmd/</span>                              <span class="cmt">// Entry points — thin, only wire-up</span>
+│   ├── <span class="dir">gateway/</span>
+│   │   └── main.go                   <span class="cmt">// Gin server + gRPC client init</span>
+│   ├── <span class="dir">engine/</span>
+│   │   └── main.go                   <span class="cmt">// Kafka consumer + goroutine pool start</span>
+│   ├── <span class="dir">executor/</span>
+│   │   └── main.go                   <span class="cmt">// Kafka consumer + DB pool init</span>
+│   ├── <span class="dir">wshub/</span>
+│   │   └── main.go                   <span class="cmt">// WebSocket server + Kafka consumer</span>
+│   ├── <span class="dir">authsvc/</span>
+│   │   └── main.go                   <span class="cmt">// Auth REST + gRPC server</span>
+│   └── <span class="dir">risksvc/</span>
+│       └── main.go                   <span class="cmt">// Risk gRPC server</span>
+│
+<span class="hl">├── internal/</span>                         <span class="cmt">// All private business logic</span>
+│   ├── <span class="dir">engine/</span>
+│   │   ├── types.go                  <span class="cmt">// Order, Trade, Side, OrderType enums (int64 prices!)</span>
+│   │   ├── orderbook.go              <span class="cmt">// OrderBook struct, Add/Cancel, BestBid/Ask (B-tree)</span>
+│   │   ├── pricelevel.go             <span class="cmt">// PriceLevel struct with Less() for btree ordering</span>
+│   │   ├── matching.go               <span class="cmt">// Match() algorithm — the core</span>
+│   │   ├── engine.go                 <span class="cmt">// MatchingEngine: Run(), goroutine pool, RegisterSymbol</span>
+│   │   └── engine_test.go            <span class="cmt">// 80%+ coverage, benchmarks, race tests</span>
+│   │
+│   ├── <span class="dir">kafka/</span>
+│   │   ├── producer.go               <span class="cmt">// Wrapped kafka-go writer with retry + batch</span>
+│   │   ├── consumer.go               <span class="cmt">// Wrapped kafka-go reader with offset mgmt</span>
+│   │   └── topics.go                 <span class="cmt">// Topic name constants</span>
+│   │
+│   ├── <span class="dir">repository/</span>
+│   │   ├── order_repo.go             <span class="cmt">// UpsertOrder, GetByID, GetOpenBySymbol</span>
+│   │   ├── trade_repo.go             <span class="cmt">// InsertTrade (append-only)</span>
+│   │   ├── balance_repo.go           <span class="cmt">// GetBalance, DebitCredit (TX)</span>
+│   │   └── position_repo.go          <span class="cmt">// UpsertPosition (VWAP calc)</span>
+│   │
+│   ├── <span class="dir">settlement/</span>
+│   │   └── executor.go               <span class="cmt">// Atomic TX: trade+balance+position+order update</span>
+│   │
+│   ├── <span class="dir">cache/</span>
+│   │   ├── redis.go                  <span class="cmt">// go-redis client wrapper</span>
+│   │   ├── balance_cache.go          <span class="cmt">// GetBalance, InvalidateBalance</span>
+│   │   └── idempotency.go            <span class="cmt">// SetTradeProcessed, IsTradeProcessed</span>
+│   │
+│   ├── <span class="dir">auth/</span>
+│   │   ├── jwt.go                    <span class="cmt">// Issue, Validate, Refresh JWT</span>
+│   │   ├── middleware.go             <span class="cmt">// Gin auth middleware</span>
+│   │   └── password.go               <span class="cmt">// bcrypt Hash, Compare</span>
+│   │
+│   ├── <span class="dir">risk/</span>
+│   │   └── checker.go                <span class="cmt">// CheckOrder: balance, limits, duplicates</span>
+│   │
+│   ├── <span class="dir">websocket/</span>
+│   │   ├── hub.go                    <span class="cmt">// Hub: Register/Unregister/Broadcast</span>
+│   │   └── client.go                 <span class="cmt">// Client: readPump/writePump goroutines</span>
+│   │
+│   └── <span class="dir">config/</span>
+│       └── config.go                 <span class="cmt">// Viper config: env vars → struct</span>
+│
+<span class="hl">├── api/</span>
+│   ├── <span class="dir">proto/</span>
+│   │   ├── order.proto               <span class="cmt">// SubmitOrder, CancelOrder RPCs</span>
+│   │   ├── engine.proto              <span class="cmt">// SubscribeOrderBook streaming RPC</span>
+│   │   ├── auth.proto                <span class="cmt">// ValidateToken, Login RPCs</span>
+│   │   └── risk.proto                <span class="cmt">// CheckOrder RPC</span>
+│   └── <span class="dir">gen/</span>                          <span class="cmt">// protoc-generated Go code (gitignored)</span>
+│       ├── order.pb.go
+│       └── order_grpc.pb.go
+│
+<span class="hl">├── pkg/</span>                              <span class="cmt">// Reusable across services</span>
+│   ├── <span class="dir">logger/</span>
+│   │   └── logger.go                 <span class="cmt">// zap structured logger, JSON in prod</span>
+│   ├── <span class="dir">metrics/</span>
+│   │   └── prometheus.go             <span class="cmt">// Counter/Histogram registration helpers</span>
+│   └── <span class="dir">tracing/</span>
+│       └── otel.go                   <span class="cmt">// OpenTelemetry tracer init, Jaeger exporter</span>
+│
+<span class="hl">├── deployments/</span>
+│   ├── <span class="dir">docker/</span>
+│   │   ├── engine.Dockerfile         <span class="cmt">// Multi-stage: golang:1.22-alpine → distroless</span>
+│   │   ├── gateway.Dockerfile
+│   │   ├── executor.Dockerfile
+│   │   ├── wshub.Dockerfile
+│   │   ├── authsvc.Dockerfile
+│   │   └── risksvc.Dockerfile
+│   ├── <span class="dir">k8s/</span>
+│   │   ├── engine-deployment.yaml
+│   │   ├── gateway-deployment.yaml
+│   │   ├── executor-deployment.yaml
+│   │   ├── wshub-deployment.yaml
+│   │   ├── authsvc-deployment.yaml
+│   │   ├── risksvc-deployment.yaml
+│   │   ├── kafka-statefulset.yaml
+│   │   ├── hpa-gateway.yaml
+│   │   ├── keda-scaledobject-executor.yaml
+│   │   ├── configmap.yaml
+│   │   ├── secrets.yaml
+│   │   ├── istio-virtualservice.yaml <span class="cmt">// Canary 90/10 split</span>
+│   │   ├── pdb-engine.yaml           <span class="cmt">// PodDisruptionBudget</span>
+│   │   └── networkpolicy.yaml
+│   └── <span class="dir">helm/</span>
+│       └── <span class="dir">order-engine/</span>
+│           ├── Chart.yaml
+│           ├── values.yaml
+│           └── <span class="dir">templates/</span>
+│
+<span class="hl">├── migrations/</span>                       <span class="cmt">// golang-migrate SQL files</span>
+│   ├── 001_create_users.up.sql
+│   ├── 002_create_orders.up.sql
+│   ├── 003_create_trades.up.sql
+│   └── 004_create_balances_positions.up.sql
+│
+<span class="hl">├── test/</span>
+│   ├── <span class="dir">integration/</span>
+│   │   ├── engine_test.go            <span class="cmt">// testcontainers-go: Kafka + real matching</span>
+│   │   └── executor_test.go          <span class="cmt">// testcontainers-go: real PostgreSQL TX</span>
+│   └── <span class="dir">load/</span>
+│       └── k6_order_flood.js         <span class="cmt">// k6 load test: 10k orders/sec sustained</span>
+│
+├── <span class="dir">.github/workflows/</span>
+│   ├── ci.yml                        <span class="cmt">// go test -race + lint + proto gen</span>
+│   └── cd.yml                        <span class="cmt">// build image → push → ArgoCD sync</span>
+│
+├── docker-compose.yml                <span class="cmt">// Local dev: all 6 services + Kafka + PG + Redis + Prometheus + Grafana</span>
+├── Makefile                          <span class="cmt">// make run, make test, make proto, make lint, make docker, make k8s-apply</span>
+├── go.mod
+├── BENCHMARKS.md
+├── ARCHITECTURE.md
+├── CONTRIBUTING.md
+└── README.md</div>
+</section>
+
+<!-- ════════════════════════════════════ -->
+<!-- SECTION 6: DATABASE                 -->
+<!-- ════════════════════════════════════ -->
+<section class="section" id="database">
+  <div class="section-head">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Database Design — PostgreSQL + Redis</h2>
+    <span class="section-badge" style="background:var(--amber-dim);border-color:var(--amber);color:var(--amber-t)">SCHEMAS</span>
+  </div>
+
+  <div class="callout c-amber">
+    <strong>Storage Strategy: Hot/Cold Separation</strong>
+    <p><strong>PostgreSQL</strong> = source of truth for all ACID data (users, orders, trades, positions, balances). <strong>Redis</strong> = hot cache for sub-ms access (balance checks, sessions, rate limits, idempotency keys). The <strong>OrderBook itself lives in Go process memory</strong> — never persisted to DB during operation. On engine restart, rebuilt from Kafka replay.</p>
+  </div>
+
+  <div class="schema">
+    <div class="schema-h"><span class="schema-tn">users</span><span class="schema-db">PostgreSQL</span></div>
+    <div class="schema-col"><span class="sc-name">id</span><span class="sc-type">UUID</span><span class="sc-flags">PK DEFAULT gen_random_uuid()</span></div>
+    <div class="schema-col"><span class="sc-name">username</span><span class="sc-type">VARCHAR(64)</span><span class="sc-flags">UNIQUE NOT NULL</span></div>
+    <div class="schema-col"><span class="sc-name">email</span><span class="sc-type">VARCHAR(255)</span><span class="sc-flags">UNIQUE NOT NULL</span></div>
+    <div class="schema-col"><span class="sc-name">password_hash</span><span class="sc-type">CHAR(60)</span><span class="sc-flags">NOT NULL</span><span class="sc-note">bcrypt cost=12</span></div>
+    <div class="schema-col"><span class="sc-name">created_at</span><span class="sc-type">TIMESTAMPTZ</span><span class="sc-flags">DEFAULT now()</span></div>
+  </div>
+
+  <div class="schema">
+    <div class="schema-h"><span class="schema-tn">orders</span><span class="schema-db">PostgreSQL</span></div>
+    <div class="schema-col"><span class="sc-name">id</span><span class="sc-type">UUID</span><span class="sc-flags">PK</span><span class="sc-note">client-generated for idempotency</span></div>
+    <div class="schema-col"><span class="sc-name">user_id</span><span class="sc-type">UUID</span><span class="sc-flags">FK → users.id NOT NULL</span></div>
+    <div class="schema-col"><span class="sc-name">symbol</span><span class="sc-type">VARCHAR(20)</span><span class="sc-flags">NOT NULL</span></div>
+    <div class="schema-col"><span class="sc-name">side</span><span class="sc-type">ENUM('BUY','SELL')</span><span class="sc-flags">NOT NULL</span></div>
+    <div class="schema-col"><span class="sc-name">order_type</span><span class="sc-type">ENUM('LIMIT','MARKET')</span><span class="sc-flags">NOT NULL</span></div>
+    <div class="schema-col"><span class="sc-name">price</span><span class="sc-type">NUMERIC(20,8)</span><span class="sc-flags">NULL</span><span class="sc-note">NULL for MARKET orders</span></div>
+    <div class="schema-col"><span class="sc-name">quantity</span><span class="sc-type">NUMERIC(20,8)</span><span class="sc-flags">NOT NULL CHECK > 0</span></div>
+    <div class="schema-col"><span class="sc-name">filled_qty</span><span class="sc-type">NUMERIC(20,8)</span><span class="sc-flags">DEFAULT 0</span></div>
+    <div class="schema-col"><span class="sc-name">status</span><span class="sc-type">ENUM</span><span class="sc-flags">OPEN|PARTIAL|FILLED|CANCELLED</span></div>
+    <div class="schema-col"><span class="sc-name">created_at</span><span class="sc-type">TIMESTAMPTZ</span><span class="sc-flags">DEFAULT now()</span><span class="sc-note">BRIN index</span></div>
+  </div>
+
+  <div class="schema">
+    <div class="schema-h"><span class="schema-tn">trades</span><span class="schema-db">PostgreSQL — append-only, high-volume</span></div>
+    <div class="schema-col"><span class="sc-name">id</span><span class="sc-type">UUID</span><span class="sc-flags">PK</span><span class="sc-note">engine-generated, idempotency key</span></div>
+    <div class="schema-col"><span class="sc-name">buy_order_id</span><span class="sc-type">UUID</span><span class="sc-flags">FK → orders.id</span></div>
+    <div class="schema-col"><span class="sc-name">sell_order_id</span><span class="sc-type">UUID</span><span class="sc-flags">FK → orders.id</span></div>
+    <div class="schema-col"><span class="sc-name">symbol</span><span class="sc-type">VARCHAR(20)</span><span class="sc-flags">NOT NULL</span></div>
+    <div class="schema-col"><span class="sc-name">price</span><span class="sc-type">NUMERIC(20,8)</span><span class="sc-flags">NOT NULL</span><span class="sc-note">execution price</span></div>
+    <div class="schema-col"><span class="sc-name">quantity</span><span class="sc-type">NUMERIC(20,8)</span><span class="sc-flags">NOT NULL</span></div>
+    <div class="schema-col"><span class="sc-name">executed_at</span><span class="sc-type">TIMESTAMPTZ</span><span class="sc-flags">DEFAULT now()</span><span class="sc-note">BRIN index</span></div>
+  </div>
+
+  <div class="schema">
+    <div class="schema-h"><span class="schema-tn">balances</span><span class="schema-db">PostgreSQL — also cached in Redis</span></div>
+    <div class="schema-col"><span class="sc-name">user_id</span><span class="sc-type">UUID</span><span class="sc-flags">PK + FK → users.id</span></div>
+    <div class="schema-col"><span class="sc-name">currency</span><span class="sc-type">VARCHAR(10)</span><span class="sc-flags">PK (composite)</span><span class="sc-note">e.g. 'INR'</span></div>
+    <div class="schema-col"><span class="sc-name">available</span><span class="sc-type">NUMERIC(20,8)</span><span class="sc-flags">NOT NULL CHECK ≥ 0</span></div>
+    <div class="schema-col"><span class="sc-name">reserved</span><span class="sc-type">NUMERIC(20,8)</span><span class="sc-flags">DEFAULT 0</span><span class="sc-note">locked for open orders</span></div>
+  </div>
+
+  <div class="schema">
+    <div class="schema-h"><span class="schema-tn">positions</span><span class="schema-db">PostgreSQL</span></div>
+    <div class="schema-col"><span class="sc-name">user_id</span><span class="sc-type">UUID</span><span class="sc-flags">PK + FK → users.id</span></div>
+    <div class="schema-col"><span class="sc-name">symbol</span><span class="sc-type">VARCHAR(20)</span><span class="sc-flags">PK (composite)</span></div>
+    <div class="schema-col"><span class="sc-name">quantity</span><span class="sc-type">NUMERIC(20,8)</span><span class="sc-flags">NOT NULL DEFAULT 0</span></div>
+    <div class="schema-col"><span class="sc-name">avg_entry_price</span><span class="sc-type">NUMERIC(20,8)</span><span class="sc-flags">DEFAULT 0</span><span class="sc-note">VWAP updated on each fill</span></div>
+  </div>
+
+  <div class="card">
+    <h3>Redis Key Patterns</h3>
+    <table>
+      <thead><tr><th>Key Pattern</th><th>Type</th><th>TTL</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>balance:{userID}</code></td><td>Hash</td><td>5 min</td><td>Pre-trade risk check hot path</td></tr>
+        <tr><td><code>session:{tokenHash}</code></td><td>String</td><td>15 min</td><td>JWT validation cache</td></tr>
+        <tr><td><code>refresh:{userID}</code></td><td>String</td><td>7 days</td><td>Refresh token store</td></tr>
+        <tr><td><code>ratelimit:{userID}:{window}</code></td><td>String</td><td>1 min</td><td>Sliding window rate limiter</td></tr>
+        <tr><td><code>trade:{tradeID}</code></td><td>String</td><td>24 h</td><td>Executor idempotency key</td></tr>
+        <tr><td><code>book:{symbol}</code></td><td>String</td><td>10 sec</td><td>Initial snapshot for new WS connections</td></tr>
+        <tr><td><code>order:{orderID}</code></td><td>Hash</td><td>1 h</td><td>Fast status lookup for clients</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Critical Database Indexes</h3>
+    <pre><span class="cm">-- orders: user's open orders (frequent query)</span>
+CREATE INDEX idx_orders_user_status ON orders(user_id, status) WHERE status IN ('OPEN','PARTIAL');
+
+<span class="cm">-- orders: symbol order book rebuild from DB on restart</span>
+CREATE INDEX idx_orders_symbol_status ON orders(symbol, status, created_at);
+
+<span class="cm">-- trades: user trade history (paginated)</span>
+CREATE INDEX idx_trades_buy_order ON trades(buy_order_id);
+CREATE INDEX idx_trades_sell_order ON trades(sell_order_id);
+
+<span class="cm">-- trades: time-based range scans (OHLCV candle generation)</span>
+CREATE INDEX idx_trades_symbol_time ON trades(symbol, executed_at DESC);</pre>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ -->
+<!-- SECTION 7: DOCKER & K8S             -->
+<!-- ════════════════════════════════════ -->
+<section class="section" id="docker">
+  <div class="section-head">
+    <span class="section-num">07</span>
+    <h2 class="section-title">Docker, Kubernetes & Scaling</h2>
+    <span class="section-badge" style="background:var(--green-dim);border-color:var(--green);color:var(--green-t)">INFRA</span>
+  </div>
+
+  <div class="card">
+    <h3>Docker Strategy — Multi-Stage Builds</h3>
+    <pre><span class="cm"># Dockerfile.engine — applies to all 6 services</span>
+<span class="kw">FROM</span> golang:1.22-alpine <span class="kw">AS</span> builder
+<span class="fn">WORKDIR</span> /app
+<span class="fn">COPY</span> go.mod go.sum ./
+<span class="fn">RUN</span> go mod download          <span class="cm"># cache dependencies layer</span>
+<span class="fn">COPY</span> . .
+<span class="fn">RUN</span> CGO_ENABLED=0 go build -ldflags=<span class="str">"-s -w"</span> \
+    -o engine ./cmd/engine    <span class="cm"># -s -w strips debug info → smaller</span>
+
+<span class="kw">FROM</span> gcr.io/distroless/static:nonroot
+<span class="fn">COPY</span> --from=builder /app/engine /engine
+<span class="fn">EXPOSE</span> 9090
+<span class="fn">ENTRYPOINT</span> [<span class="str">"/engine"</span>]
+<span class="cm"># Result: ~12MB image. Zero attack surface. No shell.</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>docker-compose.yml — Full Local Stack</h3>
+    <p>One command starts everything: all 6 Go services + Kafka + Zookeeper + PostgreSQL + Redis + Prometheus + Grafana</p>
+    <pre><span class="cm"># docker-compose.yml — 12 containers total</span>
+services:
+  <span class="fn">gateway</span>:       build: { dockerfile: deployments/docker/gateway.Dockerfile }
+  <span class="fn">engine</span>:        build: { dockerfile: deployments/docker/engine.Dockerfile }
+  <span class="fn">executor</span>:      build: { dockerfile: deployments/docker/executor.Dockerfile }
+  <span class="fn">wshub</span>:         build: { dockerfile: deployments/docker/wshub.Dockerfile }
+  <span class="fn">authsvc</span>:       build: { dockerfile: deployments/docker/authsvc.Dockerfile }
+  <span class="fn">risksvc</span>:       build: { dockerfile: deployments/docker/risksvc.Dockerfile }
+  <span class="fn">kafka</span>:         image: confluentinc/cp-kafka:7.6.0
+  <span class="fn">zookeeper</span>:     image: confluentinc/cp-zookeeper:7.6.0
+  <span class="fn">postgres</span>:      image: postgres:16-alpine
+  <span class="fn">redis</span>:         image: redis:7-alpine
+  <span class="fn">prometheus</span>:    image: prom/prometheus:latest
+  <span class="fn">grafana</span>:       image: grafana/grafana:latest</pre>
+  </div>
+
+  <div class="card">
+    <h3>Scaling Each Service</h3>
+    <table>
+      <thead><tr><th>Service</th><th>Scaling Method</th><th>Bottleneck & Solution</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td><strong>API Gateway</strong></td><td>HPA on CPU > 70%, min:2, max:8</td><td>Stateless. JWT validation → cache in Redis</td><td>~50k req/s per pod</td></tr>
+        <tr><td><strong>Matching Engine</strong></td><td>Scale by symbol shard via Kafka partitions</td><td>Stateful in-memory book → can't duplicate same symbol</td><td>100k orders/sec total</td></tr>
+        <tr><td><strong>Trade Executor</strong></td><td>KEDA on Kafka consumer lag > 500</td><td>DB write throughput → pgxpool with 20 connections</td><td>~10k trades/sec</td></tr>
+        <tr><td><strong>WebSocket Hub</strong></td><td>HPA on connection count</td><td>~50KB/conn → each pod handles ~10k connections</td><td>100k concurrent WS</td></tr>
+        <tr><td><strong>Auth Service</strong></td><td>HPA on CPU</td><td>Lightweight — most checks are Redis cache hits</td><td>~20k auth/sec</td></tr>
+        <tr><td><strong>Risk Service</strong></td><td>HPA on CPU</td><td>Redis reads only — sub-ms per check</td><td>~50k checks/sec</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ -->
+<!-- WEEK-BY-WEEK EXECUTION PLAN         -->
+<!-- ════════════════════════════════════ -->
+
+<!-- WEEK 1 -->
+<section class="section" id="week1">
+  <div class="section-head">
+    <span class="section-num">W1</span>
+    <h2 class="section-title">Week 1 — Foundations & Design (6 days)</h2>
+    <span class="section-badge" style="background:var(--acc-dim);border-color:var(--acc);color:var(--acc-t)">DAYS 1-6</span>
+  </div>
+
+  <div class="week-h">
+    <div class="week-top">
+      <div class="week-num" style="background:var(--acc-dim);color:var(--acc-t)">W1</div>
+      <div>
+        <div class="week-title">Understand the Domain, Design Everything</div>
+        <div class="week-sub">Zero code pressure. Deep research on how trading works, system architecture design, Go concurrency study, schema design, local environment setup. Output: architecture diagram + scaffolded Go project on GitHub.</div>
+      </div>
+    </div>
+    <div class="week-why" style="background:var(--acc-dim);border-color:var(--acc);color:var(--acc-t)">
+      <strong>Why this week matters:</strong> Most engineers skip domain knowledge and jump straight to code — then discover their data structures are wrong on day 10. A week of thinking saves 3 weeks of rewriting.
+    </div>
+  </div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--acc)"></div><div class="day-num">Day 1</div><div class="day-name">What is an Order Book? Deep domain dive</div><div class="day-tag" style="background:var(--acc-dim);color:var(--acc-t)">Research</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--acc)">R</span>Read how NSE/BSE matching engines work — Zerodha Varsity, Investopedia on order books</li><li><span class="task-icon" style="background:var(--acc)">R</span>Understand 4 order types: market, limit, stop, stop-limit — draw each with a scenario</li><li><span class="task-icon" style="background:var(--acc)">R</span>Understand price-time priority: same price → first order placed wins the match</li><li><span class="task-icon" style="background:var(--acc)">R</span>Study bid/ask/spread/depth — draw on paper with 5 example orders on each side</li><li><span class="task-icon" style="background:var(--acc)">R</span>Watch Jane Street "how exchanges work" on YouTube (45 min)</li></ul><div class="outcome" style="background:var(--acc-dim);color:var(--acc-t)">You can explain an order book to anyone on a whiteboard from scratch, including a live matching example.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--acc)"></div><div class="day-num">Day 2</div><div class="day-name">System design: 6 microservices split & data flow</div><div class="day-tag" style="background:var(--acc-dim);color:var(--acc-t)">Design</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--acc)">D</span>Draw all 6 microservices on paper: Gateway, Engine, Executor, WS Hub, Auth, Risk — boxes + arrows</li><li><span class="task-icon" style="background:var(--acc)">D</span>Decide gRPC vs Kafka for each connection — write reasoning in a text file</li><li><span class="task-icon" style="background:var(--acc)">D</span>Design the order lifecycle: received → validated → risk-checked → queued → matched → settled → published</li><li><span class="task-icon" style="background:var(--acc)">D</span>Study LMAX Disruptor pattern (conceptually only)</li><li><span class="task-icon" style="background:var(--acc)">D</span>Write 1-page ADR: why Go, why Kafka, why gRPC, why 6 services</li></ul><div class="outcome" style="background:var(--acc-dim);color:var(--acc-t)">Excalidraw architecture diagram showing all 6 services, data flows, protocols. Written ADR document.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--acc)"></div><div class="day-num">Day 3</div><div class="day-name">Go concurrency deep dive</div><div class="day-tag" style="background:var(--acc-dim);color:var(--acc-t)">Go Study</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--acc)">G</span>Revise goroutines, buffered/unbuffered channels, select — write 10 small programs</li><li><span class="task-icon" style="background:var(--acc)">G</span>Study sync.Mutex vs sync.RWMutex — benchmark both approaches</li><li><span class="task-icon" style="background:var(--acc)">G</span>Study sync/atomic for lock-free order ID generation</li><li><span class="task-icon" style="background:var(--acc)">G</span>Understand Go GC pause implications for low-latency matching, sync.Pool for reuse</li><li><span class="task-icon" style="background:var(--acc)">G</span>Watch "Concurrency is not Parallelism" by Rob Pike (30 min)</li></ul><div class="outcome" style="background:var(--acc-dim);color:var(--acc-t)">You understand WHY Go beats Java/Python for this system. You can write concurrent Go without race conditions.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--acc)"></div><div class="day-num">Day 4</div><div class="day-name">Protobuf schema + Kafka topic design</div><div class="day-tag" style="background:var(--acc-dim);color:var(--acc-t)">Schema</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--acc)">S</span>Install protoc, protoc-gen-go, protoc-gen-go-grpc — build Hello World gRPC service</li><li><span class="task-icon" style="background:var(--acc)">S</span>Design Order proto, Trade proto, Auth proto, Risk proto</li><li><span class="task-icon" style="background:var(--acc)">S</span>Plan 3 Kafka topics with partition strategy (key=symbol) — 6 partitions each</li><li><span class="task-icon" style="background:var(--acc)">S</span>Run Kafka + Zookeeper locally via Docker Compose — produce/consume test message</li></ul><div class="outcome" style="background:var(--acc-dim);color:var(--acc-t)">Working .proto files committed. docker-compose.yml with Kafka running. You can produce + consume via CLI.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--acc)"></div><div class="day-num">Day 5</div><div class="day-name">Project scaffold, Go modules, GitHub CI</div><div class="day-tag" style="background:var(--acc-dim);color:var(--acc-t)">Setup</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--acc)">S</span>Create full folder structure (as shown in Section 05) — <code>go mod init</code></li><li><span class="task-icon" style="background:var(--acc)">S</span>Set up Makefile: make proto, make build, make test, make docker, make k8s-apply</li><li><span class="task-icon" style="background:var(--acc)">S</span>Create GitHub repo, push initial scaffold with README</li><li><span class="task-icon" style="background:var(--acc)">S</span>GitHub Actions CI: go build + go test + golangci-lint on every push</li></ul><div class="outcome" style="background:var(--acc-dim);color:var(--acc-t)">GitHub repo live. CI green. Anyone can clone and run docker-compose up.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--acc)"></div><div class="day-num">Day 6</div><div class="day-name">B-tree data structures for the order book</div><div class="day-tag" style="background:var(--acc-dim);color:var(--acc-t)">DSA</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--acc)">D</span>Implement PriceLevel struct with Less() for btree ordering + FIFO queue (slice)</li><li><span class="task-icon" style="background:var(--acc)">D</span>Implement OrderBook struct: bids BTree (Descend) + asks BTree (Ascend), RWMutex, <code>google/btree</code></li><li><span class="task-icon" style="background:var(--acc)">D</span>Use <strong>int64</strong> for prices (not float64!) — scale by precision factor (1500.50 → 150050)</li><li><span class="task-icon" style="background:var(--acc)">D</span>Write unit tests: Add, Cancel, GetBestBid, GetBestAsk — TDD from day one</li><li><span class="task-icon" style="background:var(--acc)">D</span>Benchmark with <code>go test -bench=. -benchmem</code> — record Add() ns/op</li></ul><div class="explain"><p><strong>Why B-tree, not map?</strong> A B-tree keeps all price levels sorted — O(log n) insert/delete with natural ascending/descending iteration. For bids: <code>Descend()</code> walks highest first. For asks: <code>Ascend()</code> walks lowest first. A map has O(1) lookup but NO inherent order — you'd need a parallel sorted slice. B-tree eliminates that. Production exchanges use red-black trees (same family).</p><p><strong>Why int64, not float64?</strong> float64 causes comparison bugs: <code>1500.0 == 1500.0</code> may fail due to IEEE 754 representation. Real exchanges use integer prices scaled by precision (1500.50 → 150050 with precision=2). This is CRITICAL — change this before anything else.</p></div><div class="outcome" style="background:var(--acc-dim);color:var(--acc-t)">Core data structures coded, tested, benchmarked with int64 prices. You know the Add() latency in nanoseconds.</div></div></div>
+</section>
+
+<!-- WEEK 2 -->
+<section class="section" id="week2">
+  <div class="section-head">
+    <span class="section-num">W2</span>
+    <h2 class="section-title">Week 2 — Core Matching Engine + Services (6 days)</h2>
+    <span class="section-badge" style="background:var(--green-dim);border-color:var(--green);color:var(--green-t)">DAYS 8-13</span>
+  </div>
+  <div class="week-h"><div class="week-top"><div class="week-num" style="background:var(--green-dim);color:var(--green-t)">W2</div><div><div class="week-title">Build the Core Matching Engine + Auth + Risk</div><div class="week-sub">The heart of the project. Matching algorithm, goroutine architecture, Kafka integration, gRPC, REST gateway, WebSocket, Auth service, Risk service, benchmarking.</div></div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--green)"></div><div class="day-num">Day 8</div><div class="day-name">The matching algorithm (Match function)</div><div class="day-tag" style="background:var(--green-dim);color:var(--green-t)">Core Logic</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--green)">C</span>Implement Match(): B-tree Ascend for asks (buy order), Descend for bids (sell order)</li><li><span class="task-icon" style="background:var(--green)">C</span>Handle partial fills, full fills, market orders (P=∞ for buys, P=0 for sells)</li><li><span class="task-icon" style="background:var(--green)">C</span>Self-match prevention: buyOrder.UserID != sellOrder.UserID</li><li><span class="task-icon" style="background:var(--green)">C</span>Write 20+ unit tests: empty book, self-match, zero qty, partial fills, edge cases</li></ul><div class="outcome" style="background:var(--green-dim);color:var(--green-t)">Match() fully tested with 20+ test cases. Feed 1000 orders, correct trades produced.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--green)"></div><div class="day-num">Day 9</div><div class="day-name">MatchingEngine goroutine loop + Auth Service</div><div class="day-tag" style="background:var(--green-dim);color:var(--green-t)">Concurrency</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--green)">G</span>Build MatchingEngine: orderCh, tradeCh, Run() with select, graceful shutdown via ctx</li><li><span class="task-icon" style="background:var(--green)">G</span>Support multiple symbols: map[string]*OrderBook + RegisterSymbol() per-symbol goroutine</li><li><span class="task-icon" style="background:var(--green)">G</span>Build Auth Service: user registration, login, JWT issuance, bcrypt password hashing</li><li><span class="task-icon" style="background:var(--green)">G</span>Auth gRPC endpoint: ValidateToken for Gateway to call</li><li><span class="task-icon" style="background:var(--green)">G</span>Race condition test: <code>go test -race ./...</code> — fix EVERY race</li></ul><div class="outcome" style="background:var(--green-dim);color:var(--green-t)">Engine goroutine loop passes race detector. Auth service issues/validates JWTs.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--green)"></div><div class="day-num">Day 10</div><div class="day-name">Kafka integration + Risk Service</div><div class="day-tag" style="background:var(--green-dim);color:var(--green-t)">Kafka + Risk</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--green)">K</span>Add segmentio/kafka-go — Producer wrapper + Consumer wrapper with consumer groups</li><li><span class="task-icon" style="background:var(--green)">K</span>Engine: consume orders.submitted → match → produce trades.executed + orderbook.updates</li><li><span class="task-icon" style="background:var(--green)">K</span>Build Risk Service: gRPC CheckOrder — balance check from Redis, position limits, duplicate check</li><li><span class="task-icon" style="background:var(--green)">K</span>Add idempotency: check if order ID already exists in book before processing</li><li><span class="task-icon" style="background:var(--green)">K</span>Test: produce 500 orders → verify correct trades in trades.executed topic</li></ul><div class="outcome" style="background:var(--green-dim);color:var(--green-t)">Full Kafka pipeline end-to-end. Risk service validates orders before queueing.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--green)"></div><div class="day-num">Day 11</div><div class="day-name">gRPC order service + Trade Executor</div><div class="day-tag" style="background:var(--green-dim);color:var(--green-t)">gRPC + DB</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--green)">P</span>gRPC OrderService: SubmitOrder, CancelOrder with proper error codes</li><li><span class="task-icon" style="background:var(--green)">P</span>Server-side streaming: SubscribeOrderBook(Symbol) → stream DepthUpdate</li><li><span class="task-icon" style="background:var(--green)">P</span>Build Trade Executor: consume trades.executed → atomic PostgreSQL TX (trade + balance + position + order update)</li><li><span class="task-icon" style="background:var(--green)">P</span>Add Redis idempotency key after successful DB commit</li><li><span class="task-icon" style="background:var(--green)">P</span>Test with grpcurl — submit order, watch it match live</li></ul><div class="outcome" style="background:var(--green-dim);color:var(--green-t)">gRPC server working. Executor settles trades atomically with idempotency.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--green)"></div><div class="day-num">Day 12</div><div class="day-name">REST Gateway + WebSocket Hub</div><div class="day-tag" style="background:var(--green-dim);color:var(--green-t)">API Layer</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--green)">A</span>REST gateway with gin: POST /orders, DELETE /orders/:id, GET /orderbook/:symbol</li><li><span class="task-icon" style="background:var(--green)">A</span>Gateway calls Auth → Risk → Kafka produce — zero business logic in Gateway</li><li><span class="task-icon" style="background:var(--green)">A</span>Build WebSocket Hub service: subscribe/unsubscribe, Kafka consumer, fan-out with backpressure</li><li><span class="task-icon" style="background:var(--green)">A</span>Add input validation: price > 0, qty integer, known symbol, valid side</li><li><span class="task-icon" style="background:var(--green)">A</span>Test full round trip: curl POST → Kafka → match → WebSocket update in browser</li></ul><div class="outcome" style="background:var(--green-dim);color:var(--green-t)">POST an order via curl, watch the WebSocket in a browser update live. Full flow works end-to-end.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--green)"></div><div class="day-num">Day 13</div><div class="day-name">Benchmarking & performance profiling</div><div class="day-tag" style="background:var(--green-dim);color:var(--green-t)">Performance</div><div class="chev">▼</div></div><div class="day-b"><div class="sec-label">Tasks</div><ul class="task-list"><li><span class="task-icon" style="background:var(--green)">P</span>Write BenchmarkMatch — measure orders/second throughput</li><li><span class="task-icon" style="background:var(--green)">P</span>Use pprof: find hotspots, optimize with sync.Pool for Order/Trade objects</li><li><span class="task-icon" style="background:var(--green)">P</span>Use Protobuf for Kafka serialization instead of JSON (5x smaller, 3-5x faster)</li><li><span class="task-icon" style="background:var(--green)">P</span>Target: 100,000+ orders/second on single goroutine</li><li><span class="task-icon" style="background:var(--green)">P</span>Commit BENCHMARKS.md with methodology, hardware specs, and results</li></ul><div class="outcome" style="background:var(--green-dim);color:var(--green-t)">BENCHMARKS.md committed with real numbers. "100k+ orders/sec at &lt;1ms P99 matching latency" with proof.</div></div></div>
+</section>
+
+<!-- WEEK 3 -->
+<section class="section" id="week3">
+  <div class="section-head">
+    <span class="section-num">W3</span>
+    <h2 class="section-title">Week 3 — Docker, Kubernetes, Observability (6 days)</h2>
+    <span class="section-badge" style="background:var(--amber-dim);border-color:var(--amber);color:var(--amber-t)">DAYS 15-20</span>
+  </div>
+  <div class="week-h"><div class="week-top"><div class="week-num" style="background:var(--amber-dim);color:var(--amber-t)">W3</div><div><div class="week-title">Infrastructure Week</div><div class="week-sub">Containerise everything, deploy on K8s (Minikube), Prometheus + Grafana monitoring, Helm chart, integration tests.</div></div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--amber)"></div><div class="day-num">Day 15</div><div class="day-name">Multi-stage Dockerfiles for all 6 services</div><div class="day-tag" style="background:var(--amber-dim);color:var(--amber-t)">Docker</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--amber)">D</span>Write multi-stage Dockerfile for each service — target &lt;15MB final images using distroless</li><li><span class="task-icon" style="background:var(--amber)">D</span>Update docker-compose.yml: all 6 services + all infra (12 containers)</li><li><span class="task-icon" style="background:var(--amber)">D</span>Add /healthz (liveness) and /readyz (readiness) endpoints to every service</li><li><span class="task-icon" style="background:var(--amber)">D</span>Add .dockerignore — never ship test files, .git, vendor into images</li></ul><div class="outcome" style="background:var(--amber-dim);color:var(--amber-t)">docker-compose up starts entire system. Every image under 15MB.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--amber)"></div><div class="day-num">Day 16</div><div class="day-name">Kubernetes manifests — Deployments, Services, ConfigMaps</div><div class="day-tag" style="background:var(--amber-dim);color:var(--amber-t)">K8s</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--amber)">K</span>Set up Minikube: minikube start --cpus=4 --memory=8g</li><li><span class="task-icon" style="background:var(--amber)">K</span>Write Deployment YAMLs for all 6 services with resource limits + probes</li><li><span class="task-icon" style="background:var(--amber)">K</span>Write Services: ClusterIP for internal gRPC, LoadBalancer for Gateway</li><li><span class="task-icon" style="background:var(--amber)">K</span>ConfigMap for Kafka brokers, topic names. K8s Secrets for DB password, JWT key</li><li><span class="task-icon" style="background:var(--amber)">K</span>Kafka as StatefulSet with PersistentVolumeClaim</li></ul><div class="outcome" style="background:var(--amber-dim);color:var(--amber-t)">kubectl apply -f deployments/k8s/ brings up all services in Minikube.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--amber)"></div><div class="day-num">Day 17</div><div class="day-name">HPA + KEDA autoscaling</div><div class="day-tag" style="background:var(--amber-dim);color:var(--amber-t)">Scaling</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--amber)">H</span>Install metrics-server + KEDA</li><li><span class="task-icon" style="background:var(--amber)">H</span>HPA for Gateway: scale on CPU > 70%, min 2, max 8</li><li><span class="task-icon" style="background:var(--amber)">H</span>KEDA ScaledObject for Executor: scale on Kafka consumer lag > 500</li><li><span class="task-icon" style="background:var(--amber)">H</span>Load test with vegeta: 10k concurrent requests → watch pods scale up</li><li><span class="task-icon" style="background:var(--amber)">H</span>Screenshot the scale-up event — your best demo asset</li></ul><div class="outcome" style="background:var(--amber-dim);color:var(--amber-t)">Live demo of auto-scaling. Pods scale up during load, drop back after.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--amber)"></div><div class="day-num">Day 18</div><div class="day-name">Prometheus metrics + Grafana dashboard</div><div class="day-tag" style="background:var(--amber-dim);color:var(--amber-t)">Observability</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--amber)">O</span>Add prometheus/client_golang — /metrics endpoint on every service</li><li><span class="task-icon" style="background:var(--amber)">O</span>Instrument: orders_received_total, trades_executed_total, match_duration_seconds (histogram)</li><li><span class="task-icon" style="background:var(--amber)">O</span>Instrument: orderbook_depth_gauge{symbol,side}, Kafka consumer lag</li><li><span class="task-icon" style="background:var(--amber)">O</span>Import Grafana dashboard JSON: 4 panels — throughput, P99 latency, depth, lag</li></ul><div class="outcome" style="background:var(--amber-dim);color:var(--amber-t)">Live Grafana dashboard with real metrics. Screenshot for README.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--amber)"></div><div class="day-num">Day 19</div><div class="day-name">Helm chart packaging + CI/CD pipeline</div><div class="day-tag" style="background:var(--amber-dim);color:var(--amber-t)">Helm</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--amber)">H</span>Convert raw K8s YAML into Helm chart with parameterised values.yaml</li><li><span class="task-icon" style="background:var(--amber)">H</span>helm install --dry-run --debug → verify templates render correctly</li><li><span class="task-icon" style="background:var(--amber)">H</span>Add helm upgrade to GitHub Actions CD — auto-deploy on push to main</li><li><span class="task-icon" style="background:var(--amber)">H</span>Add helm test with smoke-test pod</li></ul><div class="outcome" style="background:var(--amber-dim);color:var(--amber-t)">One helm install deploys entire system. CD auto-deploys on merge to main.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--amber)"></div><div class="day-num">Day 20</div><div class="day-name">Integration testing with testcontainers</div><div class="day-tag" style="background:var(--amber-dim);color:var(--amber-t)">Testing</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--amber)">T</span>testcontainers-go: real Kafka + PostgreSQL in Go tests — no mocks</li><li><span class="task-icon" style="background:var(--amber)">T</span>Test: 10 crossing orders → assert exact N trades in Kafka</li><li><span class="task-icon" style="background:var(--amber)">T</span>Test: cancel order mid-flight → assert no trade occurs</li><li><span class="task-icon" style="background:var(--amber)">T</span>Add integration test step to CI. Achieve 80%+ coverage → badge to README</li></ul><div class="outcome" style="background:var(--amber-dim);color:var(--amber-t)">CI runs real integration tests. 80%+ coverage badge green on README.</div></div></div>
+</section>
+
+<!-- WEEK 4 -->
+<section class="section" id="week4">
+  <div class="section-head">
+    <span class="section-num">W4</span>
+    <h2 class="section-title">Week 4 — Polish, Security, Demo & Ship (5 days)</h2>
+    <span class="section-badge" style="background:var(--purple-dim);border-color:var(--purple);color:var(--purple-t)">DAYS 22-26</span>
+  </div>
+  <div class="week-h"><div class="week-top"><div class="week-num" style="background:var(--purple-dim);color:var(--purple-t)">W4</div><div><div class="week-title">Harden, Document, Ship</div><div class="week-sub">Security hardening, load testing, world-class README, interview prep, cloud deployment.</div></div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--purple)"></div><div class="day-num">Day 22</div><div class="day-name">Security: JWT auth, gRPC TLS, circuit breakers, NetworkPolicy</div><div class="day-tag" style="background:var(--purple-dim);color:var(--purple-t)">Hardening</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--purple)">S</span>JWT auth middleware on REST gateway — 401 if missing/invalid</li><li><span class="task-icon" style="background:var(--purple)">S</span>gRPC TLS: self-signed cert for all inter-service calls</li><li><span class="task-icon" style="background:var(--purple)">S</span>Circuit breaker (sony/gobreaker) on Gateway→Engine gRPC calls</li><li><span class="task-icon" style="background:var(--purple)">S</span>Retry with exponential backoff on Kafka producer failures</li><li><span class="task-icon" style="background:var(--purple)">S</span>K8s NetworkPolicy: engine only accepts traffic from gateway</li></ul><div class="outcome" style="background:var(--purple-dim);color:var(--purple-t)">System survives: killed Engine pod (circuit breaker), Kafka restart (retry), JWT-less request (401).</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--purple)"></div><div class="day-num">Day 23</div><div class="day-name">Load test + latency benchmarks</div><div class="day-tag" style="background:var(--purple-dim);color:var(--purple-t)">Performance</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--purple)">P</span>5-min load test with vegeta: 1000 req/sec sustained</li><li><span class="task-icon" style="background:var(--purple)">P</span>Record P50, P95, P99 latency, orders/sec, error rate</li><li><span class="task-icon" style="background:var(--purple)">P</span>Watch HPA scale during test — record terminal output</li><li><span class="task-icon" style="background:var(--purple)">P</span>Update BENCHMARKS.md with full results</li></ul><div class="outcome" style="background:var(--purple-dim);color:var(--purple-t)">Hard numbers documented. You can quote P99 latency from memory.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--purple)"></div><div class="day-num">Day 24</div><div class="day-name">World-class README + architecture docs</div><div class="day-tag" style="background:var(--purple-dim);color:var(--purple-t)">Docs</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--purple)">D</span>README: title, 1-liner, architecture diagram (Excalidraw PNG), tech stack badges, quick start</li><li><span class="task-icon" style="background:var(--purple)">D</span>ARCHITECTURE.md: ADR format — every technology choice explained</li><li><span class="task-icon" style="background:var(--purple)">D</span>Demo GIF: curl order → WebSocket update → Grafana spike</li><li><span class="task-icon" style="background:var(--purple)">D</span>CI badge, coverage badge, Go version badge, Docker image size badge</li></ul><div class="outcome" style="background:var(--purple-dim);color:var(--purple-t)">GitHub page is world-class. A recruiter understands what you built in 60 seconds.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--purple)"></div><div class="day-num">Day 25</div><div class="day-name">Interview story preparation</div><div class="day-tag" style="background:var(--purple-dim);color:var(--purple-t)">Interview</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--purple)">I</span>Prepare 2-min pitch with benchmark numbers</li><li><span class="task-icon" style="background:var(--purple)">I</span>Practice answers: "Walk me through your matching algorithm", "Why Go?", "How handle crash?", "What at 10x scale?"</li><li><span class="task-icon" style="background:var(--purple)">I</span>Know the goroutine-per-symbol ADR cold</li></ul><div class="outcome" style="background:var(--purple-dim);color:var(--purple-t)">You can walk any interviewer through this project for 30 minutes without notes.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--purple)"></div><div class="day-num">Day 26</div><div class="day-name">Cloud deploy + final demo recording</div><div class="day-tag" style="background:var(--purple-dim);color:var(--purple-t)">Ship It 🚀</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--purple)">F</span>Deploy to cloud K8s: GKE free tier, DigitalOcean, or EKS — use Helm</li><li><span class="task-icon" style="background:var(--purple)">F</span>Record 3-min Loom demo: Grafana → POST orders → book update → trades → autoscaling</li><li><span class="task-icon" style="background:var(--purple)">F</span>Tag v1.0.0 on GitHub with release notes</li><li><span class="task-icon" style="background:var(--purple)">F</span>Post on LinkedIn with architecture diagram + P99 numbers + GitHub link</li></ul><div class="outcome" style="background:var(--purple-dim);color:var(--purple-t)">Project is live on a real cluster, documented, demoed. Live URL + Loom for job applications. 🎉</div></div></div>
+</section>
+
+<!-- WEEK 5 -->
+<section class="section" id="week5">
+  <div class="section-head">
+    <span class="section-num">W5</span>
+    <h2 class="section-title">Week 5 — Kubernetes Deep Dive & Advanced (6 days)</h2>
+    <span class="section-badge" style="background:var(--red-dim);border-color:var(--red);color:var(--red-t)">DAYS 29-34</span>
+  </div>
+  <div class="week-h"><div class="week-top"><div class="week-num" style="background:var(--red-dim);color:var(--red-t)">W5</div><div><div class="week-title">Kubernetes Deep Dive + Production-Grade Features</div><div class="week-sub">K8s architecture study, KEDA event-driven scaling, Istio service mesh, ArgoCD GitOps, distributed tracing with OpenTelemetry + Jaeger.</div></div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--red)"></div><div class="day-num">Day 29-30</div><div class="day-name">K8s architecture study (no code)</div><div class="day-tag" style="background:var(--red-dim);color:var(--red-t)">Deep Study</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--red)">K</span>Control plane: API server, etcd, Scheduler, Controller Manager</li><li><span class="task-icon" style="background:var(--red)">K</span>Pod lifecycle, RBAC (ServiceAccounts, Roles, RoleBindings)</li><li><span class="task-icon" style="background:var(--red)">K</span>PodDisruptionBudget: minAvailable=1 for engine</li><li><span class="task-icon" style="background:var(--red)">K</span>Create orderbook-prod + orderbook-staging namespaces with separate RBAC</li></ul><div class="outcome" style="background:var(--red-dim);color:var(--red-t)">Draw K8s control plane on a whiteboard from memory. Understand RBAC deeply.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--red)"></div><div class="day-num">Day 31</div><div class="day-name">KEDA: event-driven autoscaling via Kafka lag</div><div class="day-tag" style="background:var(--red-dim);color:var(--red-t)">Advanced Scaling</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--red)">K</span>KEDA ScaledObject for Engine based on orders.submitted lag</li><li><span class="task-icon" style="background:var(--red)">K</span>Flood Kafka with 50k messages → watch Engine scale from 1 to 8</li><li><span class="task-icon" style="background:var(--red)">K</span>Scale to zero when no messages for 5 minutes (cost savings)</li></ul><div class="outcome" style="background:var(--red-dim);color:var(--red-t)">Engine auto-scales based on Kafka lag, not CPU. Can scale to zero. Extraordinary demo asset.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--red)"></div><div class="day-num">Day 32</div><div class="day-name">Istio service mesh: mTLS + canary deployments</div><div class="day-tag" style="background:var(--red-dim);color:var(--red-t)">Service Mesh</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--red)">I</span>Install Istio, enable mTLS PeerAuthentication — all traffic encrypted</li><li><span class="task-icon" style="background:var(--red)">I</span>VirtualService: 90% → engine v1, 10% → engine v2 (canary)</li><li><span class="task-icon" style="background:var(--red)">I</span>View Kiali service mesh graph — real-time traffic topology</li></ul><div class="outcome" style="background:var(--red-dim);color:var(--red-t)">All inter-service traffic mTLS encrypted. Canary deployment working. Kiali screenshot for README.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--red)"></div><div class="day-num">Day 33</div><div class="day-name">GitOps with ArgoCD</div><div class="day-tag" style="background:var(--red-dim);color:var(--red-t)">GitOps</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--red)">G</span>Install ArgoCD, create Application pointing to your repo's k8s/ folder</li><li><span class="task-icon" style="background:var(--red)">G</span>Auto-sync: push to main → ArgoCD detects → applies to cluster</li><li><span class="task-icon" style="background:var(--red)">G</span>Test rollback: push bad config → ArgoCD UI 1-click rollback</li></ul><div class="outcome" style="background:var(--red-dim);color:var(--red-t)">Every push auto-deploys. Rollback takes 2 clicks. Every change is in Git history.</div></div></div>
+
+  <div class="day"><div class="day-h" onclick="toggle(this)"><div class="day-dot" style="background:var(--red)"></div><div class="day-num">Day 34</div><div class="day-name">Distributed tracing + final hardening</div><div class="day-tag" style="background:var(--red-dim);color:var(--red-t)">Observability++</div><div class="chev">▼</div></div><div class="day-b"><ul class="task-list"><li><span class="task-icon" style="background:var(--red)">T</span>Add OpenTelemetry SDK to all services — instrument with trace spans</li><li><span class="task-icon" style="background:var(--red)">T</span>Deploy Jaeger — submit order → see full trace: Gateway → Engine → Executor</li><li><span class="task-icon" style="background:var(--red)">T</span>Final README update with Jaeger screenshot, ArgoCD badge, KEDA description</li></ul><div class="outcome" style="background:var(--red-dim);color:var(--red-t)">Complete observability: metrics + logs + traces. Project is genuinely production-grade.</div></div></div>
+</section>
+
+<!-- ════════════════════════════════════ -->
+<!-- IMPROVEMENTS                        -->
+<!-- ════════════════════════════════════ -->
+<section class="section" id="improvements">
+  <div class="section-head">
+    <span class="section-num">09</span>
+    <h2 class="section-title">Critical Improvements & Best Practices</h2>
+    <span class="section-badge" style="background:var(--purple-dim);border-color:var(--purple);color:var(--purple-t)">PRODUCTION</span>
+  </div>
+
+  <div class="imp"><div class="imp-icon">🔢</div><div class="imp-body"><div class="imp-title">Use int64 for prices/quantities, NEVER float64</div><div class="imp-desc">float64 causes comparison bugs in the matching algorithm. Real exchanges represent prices as integers scaled by precision (1500.50 → 150050). Change this on Day 6 before anything else.</div></div><div class="imp-badge" style="background:var(--red-dim);border-color:var(--red);color:var(--red-t)">CRITICAL</div></div>
+
+  <div class="imp"><div class="imp-icon">🌳</div><div class="imp-body"><div class="imp-title">B-tree for price levels (already planned)</div><div class="imp-desc">Use <code>github.com/google/btree</code> for O(log n) insert/delete with natural sort order. Eliminates the map + auxiliary sorted slice approach entirely.</div></div><div class="imp-badge" style="background:var(--amber-dim);border-color:var(--amber);color:var(--amber-t)">HIGH</div></div>
+
+  <div class="imp"><div class="imp-icon">♻️</div><div class="imp-body"><div class="imp-title">sync.Pool for Order and Trade structs</div><div class="imp-desc">At 100k orders/sec, you allocate/GC 100k objects per second. sync.Pool reuses them, reducing GC pauses by 40-60% under load.</div></div><div class="imp-badge" style="background:var(--acc-dim);border-color:var(--acc);color:var(--acc-t)">MEDIUM</div></div>
+
+  <div class="imp"><div class="imp-icon">📦</div><div class="imp-body"><div class="imp-title">Protobuf for Kafka messages, not JSON</div><div class="imp-desc">JSON: ~200 bytes per order. Protobuf: ~40 bytes. 5x smaller, 3-5x faster to serialize. Your proto files serve double duty — gRPC + Kafka.</div></div><div class="imp-badge" style="background:var(--acc-dim);border-color:var(--acc);color:var(--acc-t)">MEDIUM</div></div>
+
+  <div class="imp"><div class="imp-icon">🔌</div><div class="imp-body"><div class="imp-title">pgxpool for DB connection pooling</div><div class="imp-desc">Use <code>pgxpool.Pool</code> with MaxConns: 20. Without it, under load the Executor spawns thousands of TCP connections and PostgreSQL connection limit errors cause settlement failures.</div></div><div class="imp-badge" style="background:var(--green-dim);border-color:var(--green);color:var(--green-t)">STD PRACTICE</div></div>
+
+  <div class="imp"><div class="imp-icon">🏥</div><div class="imp-body"><div class="imp-title">Liveness vs Readiness probes — get them right</div><div class="imp-desc"><strong>Liveness</strong> (/healthz): returns 200 if process alive. NEVER check external deps here. <strong>Readiness</strong> (/readyz): returns 200 only when ready to accept traffic — check Kafka connected, DB pool healthy.</div></div><div class="imp-badge" style="background:var(--green-dim);border-color:var(--green);color:var(--green-t)">STD PRACTICE</div></div>
+
+  <div class="imp"><div class="imp-icon">💀</div><div class="imp-body"><div class="imp-title">Chaos engineering: kill pods and prove correctness</div><div class="imp-desc">kubectl delete pod while load test is running. Document: how many orders reprocessed, recovery time, any double-settlements? If idempotency is correct: zero double-settlements, recovery in &lt;10 seconds.</div></div><div class="imp-badge" style="background:var(--purple-dim);border-color:var(--purple);color:var(--purple-t)">FAANG LEVEL</div></div>
+</section>
+
+<!-- ════════════════════════════════════ -->
+<!-- FINAL SUMMARY                       -->
+<!-- ════════════════════════════════════ -->
+<section class="section" id="summary">
+  <div class="section-head">
+    <span class="section-num">10</span>
+    <h2 class="section-title">Complete System Summary</h2>
+    <span class="section-badge" style="background:var(--green-dim);border-color:var(--green);color:var(--green-t)">FINAL</span>
+  </div>
+
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>What It Does</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Core Engine</strong></td><td>Go + B-tree (google/btree) + int64 prices</td><td>100k+ orders/sec price-time priority matching</td></tr>
+      <tr><td><strong>API</strong></td><td>Gin REST + gRPC</td><td>HTTP for clients, gRPC for service-to-service</td></tr>
+      <tr><td><strong>Auth</strong></td><td>JWT + bcrypt + Redis sessions</td><td>Registration, login, token issuance/validation</td></tr>
+      <tr><td><strong>Risk</strong></td><td>gRPC + Redis</td><td>Pre-trade balance/limit/duplicate checks</td></tr>
+      <tr><td><strong>Real-time</strong></td><td>WebSocket Hub (gorilla/websocket)</td><td>Live order book depth pushed to clients</td></tr>
+      <tr><td><strong>Messaging</strong></td><td>Apache Kafka (3 topics, 6 partitions each)</td><td>Durable, replayable event stream</td></tr>
+      <tr><td><strong>Storage</strong></td><td>PostgreSQL + Redis</td><td>Trade history + session/balance cache</td></tr>
+      <tr><td><strong>Containers</strong></td><td>Docker multi-stage (distroless)</td><td>Sub-15MB images, reproducible builds</td></tr>
+      <tr><td><strong>Orchestration</strong></td><td>Kubernetes + Helm</td><td>Self-healing, rolling deploys, namespace isolation</td></tr>
+      <tr><td><strong>Scaling</strong></td><td>HPA + KEDA</td><td>CPU-based + event-driven autoscaling</td></tr>
+      <tr><td><strong>Security</strong></td><td>JWT + mTLS (Istio) + RBAC + NetworkPolicy</td><td>Auth at every layer, encrypted traffic</td></tr>
+      <tr><td><strong>GitOps</strong></td><td>ArgoCD</td><td>Git = source of truth, auto-sync, audited rollbacks</td></tr>
+      <tr><td><strong>Observability</strong></td><td>Prometheus + Grafana + Jaeger</td><td>Metrics + dashboards + distributed traces</td></tr>
+      <tr><td><strong>CI/CD</strong></td><td>GitHub Actions</td><td>Test + build + deploy on every push</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout c-purple">
+    <strong>The Interview One-Liner</strong>
+    <p>"I built a production-grade order matching engine in Go with price-time priority FIFO matching at 100k+ orders/sec. The order book uses a B-tree (google/btree) with int64 prices for price levels — O(log n) insert/delete with natural ascending/descending traversal. The system has 6 microservices: API Gateway, Matching Engine, Trade Executor, WebSocket Hub, Auth Service, and Risk Service — communicating via gRPC (sync) and Kafka (async). Deployed on Kubernetes with KEDA event-driven autoscaling based on Kafka lag, mTLS via Istio service mesh, GitOps via ArgoCD, and full observability with Prometheus, Grafana dashboards, and Jaeger distributed tracing. The engine handles partial fills, market orders, self-match prevention, and graceful shutdown — all tested with testcontainers at 80%+ coverage."</p>
+  </div>
+</section>
+
+</div><!-- .wrap -->
+
+<script>
+function toggle(head){
+  const body=head.nextElementSibling;
+  const chev=head.querySelector('.chev');
+  const open=body.classList.toggle('open');
+  chev.classList.toggle('open',open);
+}
+</script>
+</body>
+</html>
